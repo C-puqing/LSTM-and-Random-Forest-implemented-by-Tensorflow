@@ -9,17 +9,12 @@ from sklearn.ensemble import RandomForestRegressor
 feanum=1#一共有多少特征
 window=5#时间窗设置
 
-path = '/content/drive/MyDrive/data.csv' #文件路径
+path = './data.csv' #文件路径
 df1=pd.read_csv(path) #读取数据
 
 min_max_scaler = preprocessing.MinMaxScaler()
 df0=min_max_scaler.fit_transform(df1)
 df = pd.DataFrame(df0, columns=df1.columns)
-
-# 取16-19年训练，检测20年
-dataset = [] #数据集合
-for i in range(5):
-    dataset = dataset + list(df.iloc[:,i])
 
 #处理数据
 stock=pd.DataFrame(dataset)
@@ -31,7 +26,7 @@ result = []
 for index in range(len(data) - sequence_length):#循环 数据长度-时间窗长度 次
     result.append(data[index: index + sequence_length])#第i行到i+5
 result = np.array(result)#得到样本，样本形式为 window*feanum
-cut=376#分训练集验证集，20年的做验证使用
+cut=376#分训练集验证集
 train = result[:-cut, :]
 x_train = train[:, :-1]
 y_train = train[:, -1][:,-1]
@@ -84,12 +79,3 @@ print('测试集上的MAE/MSE/MAPE')
 print(mean_absolute_error(y_test_predict, y_test))
 print(mean_squared_error(y_test_predict, y_test) )
 print(mape(y_test_predict, y_test) )
-
-#计算验证集的预测结果与真实值的精度误差
-error = 0
-for i in range(376):
-    error += abs(y_test[i] - y_test_predict[i])
-error /= 376
-x = 1.5 #可控
-print("error = ",error)
-print("accuracy = ",(1 - error)/x *100)
